@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,14 +24,59 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   String _imageSource = 'images/questionmark.png';
 
-  void _checkLogin() {
-    setState(() {
-      if (_passwordController.text == 'QWERTY123') {
-        _imageSource = 'images/idea.png';
-      } else {
-        _imageSource = 'images/stop.png';
-      }
-    });
+  final _secureStorage = FlutterSecureStorage();
+
+  Future<void> _checkLogin() async {
+    final password = _passwordController.text;
+
+    if (password == 'QWERTY123') {
+      _imageSource = 'images/idea.png';
+      // Save username and password to EncryptedSharedPreferences
+      await _secureStorage.write(key: 'username', value: _loginController.text);
+      await _secureStorage.write(key: 'password', value: password);
+    } else {
+      _imageSource = 'images/stop.png';
+      // Clear saved data in EncryptedSharedPreferences
+      await _secureStorage.delete(key: 'username');
+      await _secureStorage.delete(key: 'password');
+    }
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Load data from EncryptedSharedPreferences on program start
+    _loadSavedData();
+  }
+
+  Future<void> _loadSavedData() async {
+    final username = await _secureStorage.read(key: 'username');
+    final password = await _secureStorage.read(key: 'password');
+
+    if (username != null && password != null) {
+      // Populate EditText fields with stored values
+      _loginController.text = username;
+      _passwordController.text = password;
+
+      // Show Snackbar indicating loaded data
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Previous login name and passwords loaded.'),
+          action: SnackBarAction(
+            label: 'Clear Saved Data',
+            onPressed: () {
+              // Clear data and reset EditText fields
+              _loginController.clear();
+              _passwordController.clear();
+              _secureStorage.delete(key: 'username');
+              _secureStorage.delete(key: 'password');
+            },
+          ),
+        ),
+      );
+    }
   }
 
   @override
