@@ -1,4 +1,4 @@
-name: week_three
+name: week_four
 description: "A new Flutter project."
 publish_to: 'none'  # Keeps the package private, remove to publish
 
@@ -10,10 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_secure_storage: ^5.0.0
+  sqflite: ^2.0.0+4
+  path_provider: ^2.0.11
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.0.6
-  encrypt: ^5.0.1  # Added encrypt package
+  encrypt: ^5.0.1
+  url_launcher: ^6.0.9
 
 dev_dependencies:
   flutter_test:
