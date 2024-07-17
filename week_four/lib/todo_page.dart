@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // Import kIsWeb
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'todo_dao.dart';
 import 'todo_dao_web.dart';
+import 'todo_details_page.dart'; // Import the TodoDetailsPage
 
 class TodoPage extends StatefulWidget {
   @override
@@ -52,35 +53,44 @@ class _TodoPageState extends State<TodoPage> {
     _loadTodoItems();
   }
 
+  void _showDetails(BuildContext context, int index) {
+    final item = _todoItems[index];
+    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TodoDetailsPage(
+            id: item['id'],
+            title: item['title'],
+            onDelete: () => _deleteItem(index),
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: Text('Todo Details'),
+            ),
+            body: TodoDetailsPage(
+              id: item['id'],
+              title: item['title'],
+              onDelete: () => _deleteItem(index),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
   Widget _buildItem(BuildContext context, int index) {
     final item = _todoItems[index];
     return ListTile(
       title: Text('Row number: $index'),
       subtitle: Text(item['title']),
-      onLongPress: () => _showDeleteDialog(index),
-    );
-  }
-
-  void _showDeleteDialog(int index) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Delete Item'),
-        content: Text('Are you sure you want to delete this item?'),
-        actions: [
-          TextButton(
-            child: Text('No'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          TextButton(
-            child: Text('Yes'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              _deleteItem(index);
-            },
-          ),
-        ],
-      ),
+      onTap: () => _showDetails(context, index), // Changed from onLongPress to onTap
     );
   }
 
