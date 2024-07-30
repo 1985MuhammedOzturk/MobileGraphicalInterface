@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'profile_page.dart';
 import 'todo_page.dart';
-import 'login_page.dart'; // Import the LoginPage
+import 'login_page.dart';
 
 void main() {
   runApp(MyApp());
